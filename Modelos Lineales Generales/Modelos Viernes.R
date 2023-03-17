@@ -1,4 +1,4 @@
-#################### Análisis Exploratorio de Datos####################
+#################### Exploratorio de Datos####################
 #################### Introducción al manejo gráfico en R###############
 ######### Andrés Felipe Palomino Monteuma - Escuela de estadística#####
 ####### Universidad del Valle - Modelo Lineal General I################
