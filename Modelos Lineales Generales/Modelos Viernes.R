@@ -3,7 +3,7 @@
 ######### Andrés Felipe Palomino Monteuma - Escuela de estadística#####
 ####### Universidad del Valle - Modelo Lineal General I################
 #Visualización datos catégoricos
-set.seed(1)
+set.seed(10)
 x<- sample(c('Excelente','Regular','Malo'),size=10,replace=T,prob=c(0.2,0.4,0.4))
 y<- sample(c('Excelente','Regular','Malo'),size=10,replace=T,prob=c(0.8,0.1,0.1))
 z<- sample(c('Excelente','Regular','Malo'),size=10,replace=T,prob=c(0.9,0.05,0.05))
