@@ -7,7 +7,7 @@
 set.seed(10) #Semilla para que los resultados sean replicables
 x<- sample(c('Excelente','Regular','Malo'),size=10,replace=T,prob=c(0.2,0.4,0.4))
 y<- sample(c('Excelente','Regular','Malo'),size=10,replace=T,prob=c(0.8,0.1,0.1))
-z<- sample(c('Excelente','Regular','Malo'),size=10,replace=T,prob=c(0.9,0.05,0.05))
+z<- sample(c('Excelente','Regular','Malo'),size=10,replace=T,prob=c(0.7,0.3,0))
 X<- as.data.frame(cbind(x,y,z))
 colnames(X)<- c('Per.Clase','Per.Monitoria','Per.Calif')
 View(X)
@@ -130,7 +130,7 @@ summary(X)
 resumen<- function(x){
   X<- matrix(0,9,1)
   resumen<- round(c(mean(x),median(x),min(x),max(x),var(x),sd(x),quantile(x,0.25),quantile(x,0.75),sd(x)/mean(x)),4)
-  for( i  in 1:7){
+  for( i  in 1:9){
     X[i,]<- resumen[i]
   }
   rownames(X)<-c('Media','Mediana','Min','Max','Var','Sd','1st Qu.','3rd Qu','Coef.Var')
