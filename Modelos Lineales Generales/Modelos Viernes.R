@@ -2,6 +2,7 @@
 #################### Introducción al manejo gráfico en R###############
 ######### Andrés Felipe Palomino Monteuma - Escuela de estadística#####
 ####### Universidad del Valle - Modelo Lineal General I################
+########## Haremos uso de simulación de datos para poder realizar la clase
 #Visualización datos catégoricos
 set.seed(10) #Semilla para que los resultados sean replicables
 x<- sample(c('Excelente','Regular','Malo'),size=10,replace=T,prob=c(0.2,0.4,0.4))
