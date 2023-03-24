@@ -172,7 +172,8 @@ max(diferencia[diferencia>0])
 min(diferencia[diferencia<0])
 ########### Coeficiente de correlación lineal de pearson
 cor(UBSprices$rice2003,UBSprices$rice2009)
-######################### #Gráficon con la variable auxiliar
+######################### #Gráficon con la variable auxiliarz11()
+x11()
 plot(UBSprices$rice2003,UBSprices$rice2009,xlab="Precio del arroz en minutos de trabajo en el año 2003",ylab="Precio del arroz en minutos de trabajo en el año 2009")
 points(UBSprices$rice2003[diferencia>0],UBSprices$rice2009[diferencia>0],col="blue4",pch=19)
 points(UBSprices$rice2003[diferencia<0],UBSprices$rice2009[diferencia<0],col="red4",pch=19)
@@ -180,5 +181,31 @@ points(UBSprices$rice2003[diferencia==0],UBSprices$rice2009[diferencia==0],col="
 legend(x = "bottomright",legend=c("Aumento","Disminuyo","Se mantuvo"),
        col = c("blue4","red4","black"),pt.cex=1,pch=c(19,19,19),
        box.lwd=0.6,text.font =15,cex=0.8)
+summary(diferencia)
 indices4<-c(which(diferencia[,1]>40),which(diferencia[,1]< -10))
 text(UBSprices$rice2003[indices4],UBSprices$rice2009[indices4],labels=rownames(X)[indices4],cex=0.9,pos=2)
+#
+##### Modelo de regresión lineal
+model<- lm(Arroz2009~Arroz2003,data=X)
+################### Informe Modelo
+x.nuevo = data.frame(Arroz2003=seq(min(X[,1]),max(X[,1]),length.out=nrow(X)))
+pred.media = predict(model,x.nuevo,interval = 'confidence')
+pred.nuev.obs= predict(model,x.nuevo,interval = 'prediction')
+plot(X[,1],X[,2],xlab="Precio por país en minutos de trabajo para un Kg de Arroz (2003)",
+     ylab="Precio por país en minutos de trabajo para un Kg de Arroz (2009)",pch=19, panel.first = grid(),
+     ylim=c(0,100),main='Modelo de regresión')
+abline(model)
+#Pintamos con la función point las diferencias de precios
+points(X$Arroz2003[indices2],X$Arroz2009[indices2],col='red',pch=19)
+points(X$Arroz2003[indices3],X$Arroz2009[indices3],col='black',pch=19)
+points(X$Arroz2003[indices],X$Arroz2009[indices],col='blue',pch=19)
+text(X$Arroz2003[indices4],X$Arroz2009[indices4],labels=rownames(X)[indices4],cex=0.9,pos=2)
+
+lines(x.nuevo$Arroz2003,pred.media[,2],lty=2,col="purple",lwd=2)
+lines(x.nuevo$Arroz2003,pred.media[,3],lty=2,col="purple",lwd=2)
+lines(x.nuevo$Arroz2003,pred.nuev.obs[,2],lty=3,col="red",lwd=2)
+lines(x.nuevo$Arroz2003,pred.nuev.obs[,3],lty=3,col="red",lwd=2)
+legend(x = "bottomright",legend=c("Modelo","Intervalo de confianza 95%","Intervalo de predicción 95%"),
+       col = c("black","purple","red"),lty = c(1, 2,3),pt.cex=1,
+       box.lwd=0.6,text.font =15,cex=0.3)
+
