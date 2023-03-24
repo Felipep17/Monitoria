@@ -55,13 +55,13 @@ class(X[,1])
 X<- as.data.frame(cbind(rnorm(50,10,2),rpois(50,10),rweibull(50,2,6)))
 View(X)
 colnames(X)<- c('Indíce','Conteos','Tiempos')
-y<- 2+5*(1:100)+rnorm(100,50,50)
+y<- 2+5*(1:100)+rnorm(100,50,100)
 x<- 1:100
 par(mfrow=c(1,1))
 par(mar=c(4,4,4,4))
 plot(x,y)
 plot(x,y,panel.first=grid(),pch=19,col=c('aquamarine3','red1','purple'),xlab='Porcentaje de Admitidos',ylab=' Número de inscritos',main='Diagrama de dispersión')
-#Formato latéx
+#ormato latéx
 #main = expression(alpha[1] ^ 2 + frac(beta, 3))
 #Texto dentro de los gráficos
 plot(x, y, main = "Título principal", cex = 1, col = "blue",panel.first = grid())
@@ -159,7 +159,7 @@ data("UBSprices") ###### Base de datos#####################################
 View(UBSprices) # Visualización de base datos
 X<- UBSprices #Guardo la matriz 
 ####################
-pairs(UBSprices) #Exploración inicial de las variables
+pairs(UBSprices,pch=19,col='red1') #Exploración inicial de las variables
 plot(UBSprices$rice2003,UBSprices$rice2009)######### Gráfico de dispersión de mi variable de interés
 ##########
 summary(X)# Resumen de la matriz, con estadísticos 
@@ -180,3 +180,5 @@ points(UBSprices$rice2003[diferencia==0],UBSprices$rice2009[diferencia==0],col="
 legend(x = "bottomright",legend=c("Aumento","Disminuyo","Se mantuvo"),
        col = c("blue4","red4","black"),pt.cex=1,pch=c(19,19,19),
        box.lwd=0.6,text.font =15,cex=0.8)
+indices4<-c(which(diferencia[,1]>40),which(diferencia[,1]< -10))
+text(UBSprices$rice2003[indices4],UBSprices$rice2009[indices4],labels=rownames(X)[indices4],cex=0.9,pos=2)
