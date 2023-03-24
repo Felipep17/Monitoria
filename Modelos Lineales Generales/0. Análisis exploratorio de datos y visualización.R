@@ -187,6 +187,9 @@ text(UBSprices$rice2003[indices4],UBSprices$rice2009[indices4],labels=rownames(X
 #
 ##### Modelo de regresión lineal
 model<- lm(rice2009~rice2003,data=X)
+abline(model,lwd=2,lty=2)
+summary(model)
+coefficients(model)
 ################### Informe Modelo
 x.nuevo = data.frame(rice2003=seq(0,90,length.out=nrow(X)))
 pred.media = predict(model,x.nuevo,interval = 'confidence')
@@ -205,5 +208,6 @@ lines(x.nuevo$rice2003,pred.nuev.obs[,2],lty=3,col="red",lwd=2)
 lines(x.nuevo$rice2003,pred.nuev.obs[,3],lty=3,col="red",lwd=2)
 legend(x = "bottomright",legend=c("Modelo","Intervalo de confianza 95%","Intervalo de predicción 95%"),
        col = c("black","purple","red"),lty = c(1, 2,3),pt.cex=1,
-       box.lwd=0.6,text.font =15,cex=0.3)
-
+       box.lwd=0.6,text.font =15,cex=0.5)
+confint(model)
+summary(X)
