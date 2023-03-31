@@ -123,6 +123,41 @@ scatter3D(x, y, z, pch = 19, cex = 2,
                       facets = NA, fit = fitpoints), main = "")
 #Gráfico dinámico
 plotrgl()
-
-
-
+###########
+names(X)
+modelcompleto<- lm(weight~.,data=X[,-1])
+summary(modelcompleto)
+############
+names(X)
+model1<- lm(weight~age+mnocig,data=X)
+model2<- lm(weight~+age,data=X)
+summary(model1)
+summary(model2)
+anova(model1,model2)
+#############
+#Importo la librería
+library(readr)
+X <- read_csv("C:/Users/sebas/OneDrive/Escritorio/Proyectos/Modelos/Bases de datos/grasa.csv")
+head(X)
+#Breve descriptivas de la variable de respuesta
+pairs(X)
+summary(X[,1])
+# Exploración gráfica de las variables de interés para el modelo
+#######
+par(mfrow=c(2,3))
+plot(X$age,X$siri,ylab="Porcentaje de masa corporal",xlab="Edad en años",pch=19,col="blue3",panel.first = grid())
+plot(X$bmi,X$siri,ylab="Porcentaje de masa corporal",xlab="IMC Kg/Ms 2",pch=19, col="red1",panel.first = grid())
+plot(X$abdomen,X$siri, ylab="Porcentaje de masa corporal",xlab="Circuferencia del abdomen en cm",pch=19, col="#CD1076",panel.first = grid())
+plot(X$neck,X$siri,ylab="Porcentaje de masa corporal", xlab="Circuferencia del cuello en cm",pch=19,col="blue3",panel.first = grid())
+plot(X$thigh,X$siri,ylab="Porcentaje de masa corporal",xlab="Circuferencia del muslo en cm",pch=19,col="red1",panel.first = grid())
+plot(X$hip,X$siri,ylab="Porcentaje de masa corporal",xlab="Circuferencia de la cadera en cm",pch=19,col="#CD1076",panel.first = grid())
+#Modelo
+modc<- lm(siri~age+bmi+abdomen+neck+thigh+hip,data=X)
+summary(modc)
+############Estandarizado
+y = X$siri
+Z = apply(X[,-1],2,function(x){(x-mean(x))/sqrt(sum((x-mean(x))^2))}) #Puede hacerse con Scale
+Z<- scale(X[,-1])*(1/sqrt(nrow(X)-1))
+ys = (y-mean(y))/sqrt(sum((y-mean(y))^2))
+mod.std = lm(ys~Z-1)
+summary(mod.std)
