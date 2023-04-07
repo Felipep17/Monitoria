@@ -79,6 +79,8 @@ linearMod <- lm(weight ~age+mppwt, data=datospesos)  # build linear regression m
 summary(linearMod)
 #intervalos de confianza para los párametros con un 95%
 confint(linearMod)
+plot(weight~age,data=datospesos)
+plot(weight~mppwt,data=datospesos)
 #representación 3D de la regresión con dos predictoras
 library(scatterplot3d)
 library(plot3D)
@@ -88,10 +90,11 @@ library(rgl)
 library(plot3Drgl)
 z<-datospesos$weight
 y<-datospesos$age
-x<-datospesos$mppwt
+x<-datospesos$mnocig
 scatter3D(x, y, z, phi = 0, bty = "b",
-          pch = 20, cex = 2, ticktype = "detailed",xlab = "mppwt",
+          pch = 20, cex = 2, ticktype = "detailed",xlab = "mnocig",
           ylab ="Edad Gestacional(Semanas)", zlab = "Peso al Nacer(Kg)")
+plotrgl()
 #La variable Z es la variable a predecir
 #Creamos un objeto para realizar las predicciones con elmodelo
 objr<-lm(z ~ x+y)
@@ -110,7 +113,7 @@ fitpoints <- predict(objr)
 #ploteamos la gráfica en 3d con recta de regresión
 scatter3D(x, y, z, pch = 19, cex = 2, 
           theta = 20, phi = 20, ticktype = "detailed",
-          xlab = "mppwt",
+          xlab = "mnocig",
           ylab ="Edad Gestacional(Semanas)", zlab = "Peso al Nacer(Kg)",  
           surf = list(x = x.pred, y = y.pred, z = z.pred,  
                       facets = NA, fit = fitpoints), main = "")
@@ -118,20 +121,24 @@ scatter3D(x, y, z, pch = 19, cex = 2,
 plotrgl()
 ###########
 names(X)
+summary(datospesos)
 modelcompleto<- lm(weight~.,data=X[,-1])
 summary(modelcompleto)
 ############
 names(X)
 model1<- lm(weight~age+mnocig,data=X)
+car::vif(model1)
 model2<- lm(weight~+age,data=X)
 summary(model1)
 summary(model2)
 anova(model1,model2)
+plot(age~mnocig,data=X)
 #############
 #Importo la librería
 library(readr)
 X <- read_csv("C:/Users/sebas/OneDrive/Escritorio/Proyectos/Modelos/Bases de datos/grasa.csv")
 head(X)
+View(X)
 #Breve descriptivas de la variable de respuesta
 pairs(X)
 summary(X[,1])
@@ -147,6 +154,7 @@ plot(X$hip,X$siri,ylab="Porcentaje de masa corporal",xlab="Circuferencia de la c
 #Modelo
 modc<- lm(siri~age+bmi+abdomen+neck+thigh+hip,data=X)
 summary(modc)
+car::vif(modc)
 ############Estandarizado
 y = X$siri
 Z = apply(X[,-1],2,function(x){(x-mean(x))/sqrt(sum((x-mean(x))^2))}) #Puede hacerse con Scale
