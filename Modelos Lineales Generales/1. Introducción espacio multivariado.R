@@ -174,3 +174,6 @@ h0 = apply(newPoints,1,function(x){t(x)%*%XtX.inv%*%x})
 h0 #Valores de la multiplicación
 h0 >hmax # Si es True extrapolo
  # Si es false no extrapolo
+summary(model)
+library(xtable)
+xtable(model)
