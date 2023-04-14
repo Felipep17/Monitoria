@@ -155,6 +155,9 @@ plot(X$hip,X$siri,ylab="Porcentaje de masa corporal",xlab="Circuferencia de la c
 modc<- lm(siri~age+bmi+abdomen+neck+thigh+hip,data=X)
 summary(modc)
 car::vif(modc)
+#######
+mods<- lm(siri~abdomen+neck+thigh+hip,data=X)
+anova(mods,modc)
 ############Estandarizado
 y = X$siri
 Z = apply(X[,-1],2,function(x){(x-mean(x))/sqrt(sum((x-mean(x))^2))}) #Puede hacerse con Scale
