@@ -80,7 +80,7 @@ summary(linearMod)
 #intervalos de confianza para los párametros con un 95%
 confint(linearMod)
 plot(weight~age,data=datospesos)
-plot(weight~mppwt,data=datospesos)
+plot(age~mppwt,data=datospesos)
 #representación 3D de la regresión con dos predictoras
 library(scatterplot3d)
 library(plot3D)
@@ -162,3 +162,15 @@ Z<- scale(X[,-1])*(1/sqrt(nrow(X)-1))
 ys = (y-mean(y))/sqrt(sum((y-mean(y))^2))
 mod.std = lm(ys~Z-1)
 summary(mod.std)
+##############
+model<- lm(weight~age+mppwt,data=datospesos) #Asigno el modelo
+plot(weight~mppwt,data=datospesos) #Gráfio del espacio generado por las covariables
+newPoints = as.data.frame(cbind(x0=rep(1,4),age=c(38,40),mppwt=c(55,60))) #Creación de puntos para el dataframe
+X. = model.matrix(model) # Deben llamarse tal cual como las variables en la base de datos
+XtX.inv = solve(t(X.)%*%X.) #Matríx inversa
+h.values = hatvalues(model) #Matriz de estimación
+hmax = max(h.values) # Valores máximo de la matrix
+h0 = apply(newPoints,1,function(x){t(x)%*%XtX.inv%*%x})
+h0 #Valores de la multiplicación
+h0 >hmax # Si es True extrapolo
+ # Si es false no extrapolo
