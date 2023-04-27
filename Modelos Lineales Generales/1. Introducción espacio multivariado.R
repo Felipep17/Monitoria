@@ -131,7 +131,6 @@ car::vif(model1)
 model2<- lm(weight~+age,data=X)
 summary(model1)
 summary(model2)
-anova(model1,model2)
 plot(age~mnocig,data=X)
 #############
 #Importo la librería
@@ -157,26 +156,5 @@ summary(modc)
 car::vif(modc)
 #######
 mods<- lm(siri~abdomen+neck+thigh+hip,data=X)
-anova(mods,modc)
-############Estandarizado
-y = X$siri
-Z = apply(X[,-1],2,function(x){(x-mean(x))/sqrt(sum((x-mean(x))^2))}) #Puede hacerse con Scale
-Z<- scale(X[,-1])*(1/sqrt(nrow(X)-1))
-ys = (y-mean(y))/sqrt(sum((y-mean(y))^2))
-mod.std = lm(ys~Z-1)
-summary(mod.std)
-##############
-model<- lm(weight~age+mppwt,data=datospesos) #Asigno el modelo
-plot(weight~mppwt,data=datospesos) #Gráfio del espacio generado por las covariables
-newPoints = as.data.frame(cbind(x0=rep(1,4),age=c(38,40),mppwt=c(55,60))) #Creación de puntos para el dataframe
-X. = model.matrix(model) # Deben llamarse tal cual como las variables en la base de datos
-XtX.inv = solve(t(X.)%*%X.) #Matríx inversa
-h.values = hatvalues(model) #Matriz de estimación
-hmax = max(h.values) # Valores máximo de la matrix
-h0 = apply(newPoints,1,function(x){t(x)%*%XtX.inv%*%x})
-h0 #Valores de la multiplicación
-h0 >hmax # Si es True extrapolo
- # Si es false no extrapolo
-summary(model)
-library(xtable)
-xtable(model)
+
+
