@@ -127,34 +127,9 @@ summary(modelcompleto)
 ############
 names(X)
 model1<- lm(weight~age+mnocig,data=X)
-car::vif(model1)
 model2<- lm(weight~+age,data=X)
 summary(model1)
 summary(model2)
 plot(age~mnocig,data=X)
 #############
-#Importo la librería
-library(readr)
-X <- read_csv("C:/Users/sebas/OneDrive/Escritorio/Proyectos/Modelos/Bases de datos/grasa.csv")
-head(X)
-View(X)
-#Breve descriptivas de la variable de respuesta
-pairs(X)
-summary(X[,1])
-# Exploración gráfica de las variables de interés para el modelo
-#######
-par(mfrow=c(2,3))
-plot(X$age,X$siri,ylab="Porcentaje de masa corporal",xlab="Edad en años",pch=19,col="blue3",panel.first = grid())
-plot(X$bmi,X$siri,ylab="Porcentaje de masa corporal",xlab="IMC Kg/Ms 2",pch=19, col="red1",panel.first = grid())
-plot(X$abdomen,X$siri, ylab="Porcentaje de masa corporal",xlab="Circuferencia del abdomen en cm",pch=19, col="#CD1076",panel.first = grid())
-plot(X$neck,X$siri,ylab="Porcentaje de masa corporal", xlab="Circuferencia del cuello en cm",pch=19,col="blue3",panel.first = grid())
-plot(X$thigh,X$siri,ylab="Porcentaje de masa corporal",xlab="Circuferencia del muslo en cm",pch=19,col="red1",panel.first = grid())
-plot(X$hip,X$siri,ylab="Porcentaje de masa corporal",xlab="Circuferencia de la cadera en cm",pch=19,col="#CD1076",panel.first = grid())
-#Modelo
-modc<- lm(siri~age+bmi+abdomen+neck+thigh+hip,data=X)
-summary(modc)
-car::vif(modc)
-#######
-mods<- lm(siri~abdomen+neck+thigh+hip,data=X)
-
 
