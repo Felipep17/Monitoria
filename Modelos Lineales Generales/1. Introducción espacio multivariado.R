@@ -132,4 +132,111 @@ summary(model1)
 summary(model2)
 plot(age~mnocig,data=X)
 #############
+X<- preciosCasas
+library(MPV)
+data("table.b4")
+X<- table.b4
+View(X)
+model<- lm(y~.,data=X)
+summary(model)
+summary(model)
+anova(model)
+#
+modelc<- lm(y~x1+x2+x4+x5+x7+x8+x9,data=X)
+summary(modelc)
+anova(modelc,model)
+modelc1<- lm(y~x1+x2+x5+x7+x9,data=X)
+summary(modelc1)
+anova(modelc1,modelc)
+modelc2<- lm(y~x1+x2+x7,data=X)
+anova(modelc2,modelc1)
+summary(modelc2)
+modelc3<- lm(y~x1+x2,data=X)
+anova(modelc2,modelc3)
+modelc4<- lm(y~x1+x2,data=X)
+summary(modelc4)
+modelc5<- lm(y~x1,data=X)
+anova(modelc5,modelc4)
+summary(model)
+car::vif(model)
+plot(X)
+car::vif(modelc4)
+############
+attach(X)
+z<-X$y
+y<-X$x1
+x<-X$x2
+scatter3D(x, y, z, phi = 0, bty = "b",
+          pch = 20, cex = 2, ticktype = "detailed",xlab = "x2",
+          ylab ="x1", zlab = "y")
+plotrgl()
+#La variable Z es la variable a predecir
+#Creamos un objeto para realizar las predicciones con elmodelo
+objr<-lm(z ~ x+y)
+objr
+#preparamos el modelado 3d
+grid.lines = 42
+x.pred <- seq(min(x), max(x), length.out = grid.lines)
+
+
+y.pred <- seq(min(y), max(y), length.out = grid.lines)
+xy <- expand.grid( x = x.pred, y = y.pred)
+z.pred <- matrix(predict(objr, newdata = xy), 
+                 nrow = grid.lines, ncol = grid.lines)
+# Marcamos las líneas de iteracción para que busquen la recta de regresión
+fitpoints <- predict(objr)
+#ploteamos la gráfica en 3d con recta de regresión
+scatter3D(x, y, z, pch = 19, cex = 2, 
+          theta = 20, phi = 20, ticktype = "detailed",
+          xlab = "x1",
+          ylab ="x2", zlab = "y",  
+          surf = list(x = x.pred, y = y.pred, z = z.pred,  
+                      facets = NA, fit = fitpoints), main = "")
+
+plot(allEffects(model)) # Crear los gráficos de los efectos
+
+y<- alEffec
+library(lmridge)
+
+# Cargar datos de ejemplo (el conjunto de datos iris)
+data(iris)
+
+# Ajustar el modelo de regresión ridge
+fit <- lmridge(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width, data = iris, lambda = 0.1)
+
+# Hacer predicciones y obtener intervalos de confianza del 95%
+newdata <- data.frame(Sepal.Width = 3.5, Petal.Length = 1.5, Petal.Width = 0.5)
+pred <- predict(fit, newdata, interval = "confidence", level = 0.95)
+
+# Mostrar los resultados
+# Cargar la librería lmridge
+library(lmridge)
+
+# Cargar datos de ejemplo (el conjunto de datos iris)
+data(iris)
+head(iris)
+# Ajustar el modelo de regresión ridge
+fit <- lmridge(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width, data = iris, lambda = 0.1)
+summary(fit)
+# Obtener los coeficientes estimados y la matriz de diseño
+beta_hat <- coef(fit)
+X <- as.matrix(cbind(rep(1,nrow(iris)),iris[,-c(1,ncol(iris))]))
+
+# Calcular la varianza del error
+sigma2_hat <- sum(residuals(fit)^2) / (nrow(iris)-4)
+
+# Calcular la matriz de covarianza de los coeficientes
+V_beta_hat <- diag(residuals(fit)^2)*solve(t(X) %*% X + 0.1*diag(ncol(X))) %*% t(X) %*%X %*% solve(t(X) %*% X + 0.1 * diag(ncol(X)))
+# Hacer una predicción para nuevas observaciones
+newdata <- data.frame(Sepal.Width = 3.5, Petal.Length = 1.5, Petal.Width = 0.5)
+X_new <- cbind(1, as.matrix(newdata))
+pred <- X_new %*% beta_hat
+se_pred <- sqrt(diag(X_new %*% V_beta_hat %*% t(X_new))) * sqrt(sigma2_hat)
+
+# Calcular los intervalos de confianza del 95%
+lower <- pred - qt(0.975, nrow(iris)-4) * se_pred
+upper <- pred + qt(0.975, nrow(iris)-4) * se_pred
+
+# Mostrar los resultados
+data.frame(lower, pred, upper)
 
