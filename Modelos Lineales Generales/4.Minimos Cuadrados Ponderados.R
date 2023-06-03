@@ -9,11 +9,10 @@ b1<- -2
 x<- 1:1000
 y<- b0+b1*x+rnorm(1000,0,1:1000)
 plot(y~x,axes=F,xlab="",ylab="")
-
 # Color de fondo gris
 rect(par("usr")[1], par("usr")[3],
      par("usr")[2], par("usr")[4],
-     col = "aquamarine")
+     col = "aquamarine1")
 
 # Grid blanco
 grid(nx = NULL, ny = NULL,
@@ -37,6 +36,7 @@ w = 1/fitted.values(varianza)^2
 #Modelo con pesos
 model.ponderados<- lm(y~x,weights = w)
 summary(model.ponderados)
+autoplot(model.ponderados)
 #Validación Supuestos
 res.ponderados<- residuals(model.ponderados)*sqrt(w)
 car::qqPlot(res.ponderados,xlab="Cuantiles Teóricos",ylab=" Residuos ponderados",pch=19)
