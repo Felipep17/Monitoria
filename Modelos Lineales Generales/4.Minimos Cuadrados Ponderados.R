@@ -46,3 +46,24 @@ plot(fitted.values(model.ponderados),res.ponderados,
 lines(lowess(res.ponderados~fitted.values(model.ponderados)),col=2,lty=2,lwd=4)
 abline(h=0,lty=2,lwd=2)
 car::crPlots(model.ponderados,pch=19)
+#
+#Errores modelo original
+res.mcp<- MASS::studres(model)
+# Estimación de la varianza
+varianza<- lm(abs(res.mcp)~x)
+#Cálculo de pesos para ponderar
+w = 1/fitted.values(varianza)^2
+#Modelo con pesos
+model.ponderados<- lm(y~x,weights = w)
+summary(model.ponderados)
+autoplot(model.ponderados)
+#Validación Supuestos
+res.ponderados<- residuals(model.ponderados)*sqrt(w)
+car::qqPlot(res.ponderados,xlab="Cuantiles Teóricos",ylab=" Residuos ponderados",pch=19)
+shapiro.test(res.ponderados)
+plot(fitted.values(model.ponderados),res.ponderados,
+     xlab='valores ajustados',ylab='residuos ponderados',pch=19,panel.first = grid(),col="aquamarine4")
+lines(lowess(res.ponderados~fitted.values(model.ponderados)),col=2,lty=2,lwd=4)
+abline(h=0,lty=2,lwd=2)
+car::crPlots(model.ponderados,pch=19)
+summary(model.ponderados)
