@@ -5,7 +5,7 @@ par(mar=c(5,5,5,5))
 library(easypackages)
 lib_req<-c("glmnet","lmridge","scatterplot3d","plot3D","plotly","rgl","plot3Drgl",
            'effects','psych',
-           'car','lmtest','MASS','latex2exp','orcutt',
+           'car','lmtest',"nortest",'MASS','latex2exp','orcutt',
            'nlme',"zoom",'ggfortify','readxl','pls',"alr4","aod","mixtools","ddalpha")# Listado de librerias requeridas por el script
 easypackages::packages(lib_req)
 #
@@ -108,8 +108,8 @@ car::vif(model.multi)
 x<- 1:100
 y<- -2+2*x+rnorm(100,0,20)+I(x^2)
 plot(y~x)
-plot(residuals(modelsimu))
 modelsimu<- lm(y~x+I(x^2))
+plot(residuals(modelsimu))
 plot(fitted.values(modelsimu),MASS::studres(modelsimu),pch=19,xlab="Valores Ajustados",ylab="Residuos Estudentizados")
 lines(lowess(MASS::studres(modelsimu)~fitted.values(modelsimu)),col="red",lwd=2,lty=2)
 abline(h=c(0,-2,2),lty=2)
@@ -544,12 +544,65 @@ library(ggfortify)
 data(kootenay, package="robustbase")
 X<- kootenay
 plot(X,pch=19,col="aquamarine4",panel.first=grid())
+######################################################
+Y1<-X
+#Estimaciones muestrales multivariados
+clcov<- cov(Y1)
+clcenter<- as.vector(colMeans(Y1))
+model<- lm(Newgate~Libby,data=X)
+#Mediana multivariada
+depth.y<-depth.halfspace(Y1,Y1,num.directions=10000,seed=1)
+sort.depth.Y<-sort(depth.y,decreasin=TRUE,index.return=TRUE)
+depth.Y.sort<-sort.depth.Y$x
+depth.Y.sort.index<-sort.depth.Y$ix
+median=sort.depth.Y$ix[1]
+#Gráfico
+par(mar=c(5,5,5,5))
+plot(Y1)
+points(Y1$Libby[median],Y1$Newgate[median],pch=19,lwd=2,cex=1,col="aquamarine")
+mixtools::ellipse(mu=clcenter,sigma=clcov,alpha=0.1,lty=2,lwd=3)
+mixtools::ellipse(mu=clcenter,sigma=clcov,alpha=0.25,lty=3,lwd=3)
+mixtools::ellipse(mu=clcenter,sigma=clcov,alpha=0.5,lty=3,lwd=3)
+hii<-hatvalues(model)
+p<- length(coefficients(model))
+n<- nrow(Y1)
+hii.c<- 2*(p/n)
+indices<- (1:nrow(Y1))[hii>hii.c]
+points(Y1$Libby[median],Y1$Newgate[median],col="red",pch=19)
+text(Y1$Libby[indices],Y1$Newgate[indices],labels=rownames(Y1)[indices],pos=3)
+#Matrix Robusta
+library(robustbase)
+require(rrcov) 
+mcd <- rrcov::CovMcd(Y1) 
+mean_mcd <- mcd$raw.center
+cov_mcd <- mcd$raw.cov
+#Ellipse 97.5% with robust MCD estimators
+mixtools::ellipse(mu = mean_mcd, sigma = cov_mcd, alpha = 0.025,col = "red", lty = 2,lwd=2)
+#########
+# get inverse of scatter 
+cov_mcd_inv <- solve(cov_mcd) 
+# compute distances 
+# compute the robust distance 
+robust_dist <- apply(Y1, 1, function(x){
+  x <- (x - mean_mcd) 
+  dist <- sqrt((t(x) %*% cov_mcd_inv %*% x)) 
+  return(dist) 
+}) 
+# set cutoff using chi square distribution 
+threshold <- sqrt(qchisq(p = 0.975, df = ncol(Y1))) 
+# df = no of columns # find outliers 
+outliers <- which(robust_dist >= threshold) 
+# gives the row numbers of outli
+points(Y1$Libby[outliers],Y1$Newgate[outliers],pch=19,col="purple")
+text(Y1$Libby[outliers],Y1$Newgate[outliers],labels=rownames(Y1)[outliers],pos=3)
+zm()
+################################################
 points(X$Libby[4],X$Newgate[4],col="red1",pch=19)
 model<- lm(Newgate~Libby,data=X)
 abline(model,lwd=2,lty=2,col="black")
+model1<- lm(Newgate~Libby,data=X[-4,])
 abline(model1,lwd=2,lty=2,col="red1")
 summary(model)
 Influ<-influence.measures(model)
 Influ$is.inf
-model1<- lm(Newgate~Libby,data=X[-4,])
 validaciongrafica(model1)
