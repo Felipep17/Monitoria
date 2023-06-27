@@ -343,6 +343,8 @@ autoplot(model2)
 #Variables Clasificadoras
 data(ais)
 par(mfrow=c(1,2))
+boxplot(ais$Hg~ais$Sex,pch=19,col=c(3,2))
+plot(density(ais$Hg))
 plot(density(ais$Hg[ais$Sex==0]),xlim=c(11,20),lwd=2,main = '',ylab='Densidad',xlab='Hg (g/dl)')
 lines(density(ais$Hg[ais$Sex==1]),col=2,lwd=2)
 plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19)
@@ -351,21 +353,23 @@ mod.ais = lm(Hg~Sex*BMI, data=ais)
 summary(mod.ais)
 # Gráfico
 #Pendientes que intersecan
-plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19,xlim=c(-100,100),ylim=c(0,20))
+plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19)
 abline(a=mod.ais$coefficients[1],b=mod.ais$coefficients[3],lwd=2)
 abline(a=mod.ais$coefficients[1]+mod.ais$coefficients[2],b=mod.ais$coefficients[3]+mod.ais$coefficients[4],col=2,lwd=2)
+abline(v=0,h=0,lty=2,lwd=2)
 grid()
 legend(x = "bottomright",legend=c("Hombres","Mujeres"),
        col=c('black',2),pt.cex=1,pch=15,title='Género',
        box.lwd=1,text.font =20,cex=0.8)
 ##
 mod.ais.red = lm(Hg~BMI, data=ais)
+summary(mod.ais.red)
 anova(mod.ais.red,mod.ais)
 ##
 mod.ais.lp = lm(Hg~Sex+BMI, data=ais)
 summary(mod.ais.lp)
 ###
-plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19,xlim=c(-100,100),ylim=c(0,20))
+plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19)
 abline(a=mod.ais$coefficients[1],b=mod.ais$coefficients[3],lwd=2)
 abline(a=mod.ais$coefficients[1]+mod.ais$coefficients[2],b=mod.ais$coefficients[3]+mod.ais$coefficients[4],col=2,lwd=2)
 abline(a=mod.ais.lp$coefficients[1],b=mod.ais.lp$coefficients[3],lwd=2,lty=2)
@@ -376,7 +380,7 @@ legend(x = "bottomright",legend=c("Hombres1","Mujeres1","Hombres2","Mujeres2"),
        col=c('black',2),pt.cex=1,title='Género',lty=c(1,1,2,2),
        box.lwd=1,text.font =20,cex=0.8)
 #Hipotésis
-anova(mod.ais,mod.ais.lp,test="LRT")
+anova(mod.ais,mod.ais.lp)
 #Nos quedamos con 
 plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19,xlim=c(-100,100),ylim=c(0,20))
 abline(h=0,v=0,lty=2,lwd=2)
@@ -389,10 +393,13 @@ lambda(mod.ais.lp,-3,3)
 mod.ais.lp.box = lm(I(Hg^0.23)~Sex*BMI, data=ais)
 validaciongrafica(mod.ais.lp)
 #Más de una categoría
+attach(Z)
 plot(density(fertility[group=="oecd"]),xlim=c(0,10),main="",lwd=2,ylab="Densidad",xlab="Fertility")
 lines(density(fertility[group=="other"]),lty=2,col="red1",lwd=2)
 lines(density(fertility[group=="africa"]),col="aquamarine3",lwd=2)
+boxplot(Z$fertility~Z$group)
 grid()
+factor()
 legend(x = "topright",legend=c("oecd","other","africa"),
        col=c('black',"red1","aquamarine3"),pt.cex=1,title='Group',lty=c(1,2,1),
        box.lwd=1,text.font =20,cex=0.8)
@@ -402,10 +409,12 @@ table(group)
 autoplot(mod.UN11)
 ########Gráfico
 Beta.UN11 = mod.UN11$coefficients
+mod.UN112 = lm(log(fertility)~log(ppgdp), data=UN11)
 plot(log(fertility)~log(ppgdp),data=UN11,col=UN11$group,xlab='log PNB per cápita (dólares)', ylab='log # esperado de nacidos vivos por mujer',pch=19)
 abline(a=Beta.UN11[1],b=Beta.UN11[4],lwd=2)
 abline(a=Beta.UN11[1]+Beta.UN11[2],b=Beta.UN11[4]+Beta.UN11[5],col=2,lwd=2,pch=19)
 abline(a=Beta.UN11[1]+Beta.UN11[3],b=Beta.UN11[4]+Beta.UN11[6],col=3,lwd=2,pch=19)
+abline(mod.UN112,lwd=2,lty=2,col="blue4")
 legend(x = "topright",legend=c("oecd","other","africa"),
        col=c('black',2,3),pt.cex=1,title='Group',lty=c(1,2,1),
        box.lwd=1,text.font =20,cex=0.8)
@@ -420,6 +429,7 @@ anova(mod.UN11.red,mod.UN11)
 #Hipotésis por partes
 L = matrix(c(0,0,0,0,1,-1),1,6,byrow = T)
 linearHypothesis(mod.UN11, hypothesis.matrix=L)
+autoplot(mod.UN11)
 #Simulación pruebas de hipotésis
 Shapi1<-mapply(Shapiro<-function(x){
   x<- 1:300
