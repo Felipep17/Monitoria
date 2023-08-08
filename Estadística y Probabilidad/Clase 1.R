@@ -50,7 +50,6 @@ library(matrixcalc)
 matrix.power(matrix2,2)
 dim(matrix);dim(matrix2)
 matrix%*%matrix2
-#### Creación de secuencias ####
 ####Operadores logicos ####
 ejercicio<- c(-10,8,9,10,15,19,20,12,0,0,0,0,1,12-10,-10,-12)
 ejercicio>0
@@ -94,3 +93,8 @@ rownames(X)<- X[,1];View(X)
 X<- X[,-1]
 #Clases de las columnas 
 str(X)
+#Visualización inicial data.frame
+head(X)
+# resumen
+summary(X)
+#Es necesario convertir factores. ¿Cómo lo harías?
