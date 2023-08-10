@@ -1,0 +1,104 @@
+---
+title: "Monitoria 1"
+author: "Felipe Palomino"
+date: "2023-08-10"
+output: html_document
+---
+<div class=text-justify>  
+En este documento tendremos como fin ilustrar un archivo de R-Markdown para los estudiantes en el curso de Estadística para que sea mucho más fácil y compacto para ellos realizar sus propios informes.
+</div>
+
+<div class=text-justify>
+### Introducción a R-MarkDown
+
+Inicialmente realizaremos la importación de la base de datos pero no sin antes definifir cada variable:<div>
+
+1) Edad: Edad de las personas en años
+<div>
+2) Peso: Peso de las personas en kg
+<div>
+3) Altura: Altura de las personas en cm
+<div>
+4) Sexo: Sexo de las personas (Hombre o Mujer)
+<div>
+5) Muñeca: Longitud de la muñeca en centímetros 
+<div>
+6) Bícepts: Longitud de los bíceps en centíemtros
+
+    
+## Importación de la base de datos
+```{r, warning=FALSE}
+library(readxl)
+Data <- read_excel("C:/Users/sebas/OneDrive/Escritorio/Universidad Javeriana/Profesora Isabel/Data.xlsx")
+X<- data.frame(Data)
+#Observar los primeros elementos
+head(X)
+#Observar la clase de los elementos
+str(X)
+#Observamos que la columna del género no aparece como un factor así
+#Que lo corregiremos
+X$sexo<- factor(X$sexo,levels=c("Hombre","Mujer"),labels=c("Hombre",
+                                                           "Mujer"))
+#Comprobamos
+str(X)
+```
+<div class=text-justify>   
+Ahora procederemos a realizar estadísticas descriptivas básicas con la función summary
+```{r, warning=FALSE}
+summary(X)
+#También recordemos podemos aplicar otras descriptivas
+#Desviación estándar
+apply(X[,-4],2,sd)
+#Crear funciones para realizar el coeficiente de variación
+coefvar<- function(x){
+  coefvar<- round((sd(x)/abs(mean(x)))*100,3)
+}
+cat("Coeficiente de variación %:")
+apply(X[,-4],2,coefvar)
+```
+<div class=text-justify>
+Ahora procederemos a realizar los diferentes gráficos descriptivos y evaluación de estructuras de correlación lineal.
+```{r}
+cor<- round(cor(X[,-4],method="pearson"),2);cor
+#Podemos hacerlo mucho más bonito básandonos en librerías como ggplot2 y reshape
+library(ggplot2);library(reshape2)
+melted_cor <- melt(cor)
+  ggplot(data = melted_cor, aes(x=Var1, y=Var2, fill=value)) + 
+    geom_tile() +
+    geom_text(aes(Var2, Var1, label = value), size = 5) +
+    scale_fill_gradient2(low = "blue", high = "red",
+                         limit = c(-1,1), name=("Correlation Pearson")) +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          panel.background = element_blank())
+#Ahora evaluamos esta estructura de correlación con diagramas de dispersión
+pairs(X[,-4],pch=19)
+```
+```{r}
+#Ahora procederemos a realizar histogramas junto con densidades para
+#Cada variable cuantitativa
+hist(X$edad,main="",xlab="Edad",col="aquamarine4",freq=FALSE,ylab="Frecuencia Relativa",panel.first=grid())
+lines(density(X$edad),lwd=2,lty=2)
+#Procedemos a realizar boxplots por grupos
+boxplot(X$biceps~X$sexo,main="",xlab="Sexo",ylab="Circuferencia del Biceps en cm",pch=19,col="white",border=c("blue4","pink"))
+
+```
+```{r}
+## Agregando mas detalles
+# Vertical box plot
+boxplot(X$biceps~X$sexo,main="",xlab="Sexo",ylab="Circuferencia del Biceps en cm",pch=19,col="white",border=c("blue4","pink"))
+grid(nx = NULL, ny = NULL,
+     lty = 1, col = "gray", lwd = 1)
+boxplot(X$biceps~X$sexo,xlab="Sexo",ylab="Circuferencia del Biceps en cm",pch=19,col="white",border=c("blue4","pink"),add=T)
+# Points
+stripchart(X$biceps~X$sexo,              # Data
+           method = "jitter", # Random noise
+           pch = 19,          # Pch symbols
+           col = c("blue4","pink"),           # Color of the symbol
+           vertical = TRUE,   # Vertical mode
+           add = TRUE)   
+
+```
+
+
+
