@@ -174,7 +174,8 @@ min(diferencia[diferencia<0])
 cor(UBSprices$rice2003,UBSprices$rice2009)
 ######################### #Gráficon con la variable auxiliarz11()
 x11()
-plot(UBSprices$rice2003,UBSprices$rice2009,xlab="Precio del arroz en minutos de trabajo en el año 2003",ylab="Precio del arroz en minutos de trabajo en el año 2009")
+plot(UBSprices$rice2003,UBSprices$rice2009,xlab="Precio del arroz en minutos de trabajo en el año 2003",ylab="Precio del arroz en minutos de trabajo en el año 2009",
+     ylim=c(0,100),xlim=c(0,100))
 points(UBSprices$rice2003[diferencia>0],UBSprices$rice2009[diferencia>0],col="blue4",pch=19)
 points(UBSprices$rice2003[diferencia<0],UBSprices$rice2009[diferencia<0],col="red4",pch=19)
 points(UBSprices$rice2003[diferencia==0],UBSprices$rice2009[diferencia==0],col="black",pch=19)
@@ -182,6 +183,7 @@ legend(x = "bottomright",legend=c("Aumento","Disminuyo","Se mantuvo"),
        col = c("blue4","red4","black"),pt.cex=1,pch=c(19,19,19),
        box.lwd=0.6,text.font =15,cex=0.8)
 summary(diferencia)
+abline(h=0,v=0)
 indices4<-c(which(diferencia[,1]>40),which(diferencia[,1]< -10))
 text(UBSprices$rice2003[indices4],UBSprices$rice2009[indices4],labels=rownames(X)[indices4],cex=0.9,pos=2)
 #
