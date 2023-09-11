@@ -1,5 +1,6 @@
 #### Contraste de Hipotésis e Intervalos de Confianza ####
 set.seed(1)
+library(BSDA)
 p1<- rnorm(100,50,1)
 p2<- rnorm(100,10,1)
 X<-data.frame(cbind(c(p1,p2),c(rep(1,100),rep(2,100))))
