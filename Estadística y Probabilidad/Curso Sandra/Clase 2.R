@@ -64,8 +64,7 @@ legend(1,1.2,legend=c("BAR: 6.8%","CEL: 9.1%","DEP: 29.5%",
 ####Variables Continuas####
 summary(IMC)
 x11()
-hist(IMC,xlab="IMC",ylab="Frecuencia Relativa",col="white",border="orange4",
-     freq=F,xlim=c(15,35),ylim=c(0,0.15),panel.first=grid(),main="")
+hist(Datos$IMC,xlab="IMC",ylab="Frecuencia Relativa",freq=F)
 lines(density(IMC),lwd=2,lty=2)
 #### Descriptivas ####
 summary(Hermanos)
