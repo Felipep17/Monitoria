@@ -2,10 +2,12 @@
 ## Andrés Felipe Palomino Montezuma ##
 ## Escuela de Estadística - Centro de Estudios de Estadística Sigma##
 #### Análisis Exploratorio ####
+#install.packages("easypackages")
 library(easypackages) #Librería especializada en carga de paquetes
 lib<- c("MASS","lmtest","car","corrplot","ggplot2","plotly","scatterplot3d","GGally",
         "plot3D","rgl","scatterplot3d","plot3Drgl","alr4","effects","ggfortify","reshape2",
-        "patchwork","MASS")
+        "patchwork")
+easypackages::install_packages(lib)
 easypackages::libraries(lib)
 ## Carga de base de datos ##
 data("ais")
@@ -23,19 +25,26 @@ Hist<- ggplot(Y,aes(x=Hg,fill=Sex))+geom_histogram()+ylim(0,25)+xlim(10,20)+them
   labs(title="Histograma por Sexo",x="Sexo",y="Hg")
 Densidad<-ggplot(Y,aes(x=Hg,fill=Sex))+ylim(0,1)+xlim(10,20)+theme_minimal()+
   labs(title="Histograma por Sexo",x="Sexo",y="Hg")+geom_density()
+Boxplot
+Hist
+Densidad
 ggplotly(Densidad)
 ggplotly(Boxplot)
 ggplotly(Hist)
-Y %>%
+P<-Y %>%
   group_by(Sex) %>%
   summarise(
-    media_resistencia = mean(Hg),
+    media_hg = mean(Hg),
     desviacion_estandar = sd(Hg),
     coef_var=sd(Hg)/mean(Hg),
     minimo = min(Hg),
     maximo = max(Hg),
     mediana = median(Hg)
   )
+View(P)
+install.packages("openxlsx")
+library(openxlsx)
+write.xlsx(P,"DescriptivasGenero.xlsx")
 ### Estructuras de Correlación ###
 CorGraph<- function(x,method,colneg="aquamarine",colpos="purple"){
 cor<- round(cor(x,method = method),2)
@@ -57,10 +66,11 @@ ggplotly(Correlacion)
 ## Manera mas detallada ##
 L<- ggplot(Y,aes(x=BMI,y=Hg))+geom_point()+theme_minimal()
 G<- ggplot(Y,aes(x=SSF,y=Hg))+geom_point()+theme_minimal()
-(L|G)
+(L/G)
 L
 #### Regresion Lineal Simple ####
 model<- lm(Hg~BMI,data=Y)
+options(scipen=999)
 anova(model);summary(model)
 MODEL<-L+geom_smooth(method='lm');MODEL
 ggplotly(MODEL)
