@@ -116,22 +116,23 @@ confint(model)
 predict(model,newdata = data.frame(BMI=c(20,24,30)),interval='confidence')
 predict(model2,newdata=data.frame(BMI=c(20,24,30),SSF=c(100,150,90)),interval='confidence')
 # Extrapolación oculta
-newPoints = cbind(x0=rep(1,3),BMI=c(20,24,30),SSF=c(500,150,90))
+newPoints = cbind(x0=rep(1,3),BMI=c(20,24,30),SSF=c(80,150,90))
 Auxiliar = model.matrix(model2)
 XtX.inv = solve(t(Auxiliar)%*%Auxiliar)
-h.values = hatvalues(model)
+h.values = hatvalues(model2)
 hmax = max(h.values)
 h0 = apply(newPoints,1,function(x){t(x)%*%XtX.inv%*%x})
 h0 >hmax
 #### Validación de supuestos ####
 #Simulación
 x<- 1:100
-y<- 2+2*x+rnorm(100,0,20)
+y<- 2+2*x+rexp(100,1)
 Datos<- data.frame(x=x,y=y)
 Simular<-ggplot(Datos,aes(x=x,y=y))+geom_point()+theme_minimal()
 ggplotly(Simular)
 Simular+geom_smooth(method='lm')
 modelo2<- lm(y~x)
+mean(residuals(modelo2))
 Varianza<- function(x){
   Residuos<- data.frame(Residuos=studres(x),Ajustados=fitted.values(x))
   Homocedasticidad<- ggplot(Residuos,aes(x=Ajustados,y=Residuos))+geom_point()+theme_minimal()+geom_smooth()
@@ -139,6 +140,7 @@ Varianza<- function(x){
   (Homocedasticidad)
 
 }
+Varianza(modelo2)
 ggplotly(Varianza(modelo2))
 Normalidad<- function(x){
   Residuos<- data.frame(Residuos=studres(x))
@@ -146,7 +148,7 @@ Normalidad<- function(x){
   print(shapiro.test(Residuos$Residuos))
   Normales
 }
-Normalidad(modelo2)
+ggplotly(Normalidad(modelo2))
 Temporal<- function(x){
   Residuos<- data.frame(Residuos=studres(x),tiempo=1:nrow(x$model))
   Temporal<- ggplot(Residuos, aes(y =Residuos,x=tiempo))+geom_point()+theme_minimal()+geom_line(color = "black") +  # Línea
@@ -156,3 +158,17 @@ Temporal<- function(x){
   Temporal
 }
 Temporal(modelo2)
+#### Aplicación a nuestro caso
+model2<- lm(Hg~BMI+SSF,data=Y)
+Varianza(model2)
+Normalidad(model2)
+Boxplot<- ggplot(Y,aes(y=Hg,x=Sex))+geom_boxplot(fill = "white", color = "aquamarine4")+ylim(0,25)+theme_minimal()+
+  labs(title="BoxPlot por Sexo",x="Sexo",y="Hg")
+Hist<- ggplot(Y,aes(x=Hg,fill=Sex))+geom_histogram()+ylim(0,25)+xlim(10,20)+theme_minimal()+
+  labs(title="Histograma por Sexo",x="Sexo",y="Hg")
+Densidad<-ggplot(Y,aes(x=Hg,fill=Sex))+ylim(0,1)+xlim(10,20)+theme_minimal()+
+  labs(title="Histograma por Sexo",x="Sexo",y="Hg")+geom_density()
+(Boxplot|Hist|Densidad)
+Dispersion<-ggplot(Y,aes(x=BMI,y=Hg,color=Sex))+geom_point()
+model<- lm(Hg~BMI+Sex,data=Y)
+summary(model)
