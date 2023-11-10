@@ -7,7 +7,6 @@ library(easypackages) #Librería especializada en carga de paquetes
 lib<- c("MASS","lmtest","car","corrplot","ggplot2","plotly","scatterplot3d","GGally",
         "plot3D","rgl","scatterplot3d","plot3Drgl","alr4","effects","ggfortify","reshape2",
         "patchwork")
-easypackages::install_packages(lib)
 easypackages::libraries(lib)
 ## Carga de base de datos ##
 data("ais")
@@ -172,3 +171,129 @@ Densidad<-ggplot(Y,aes(x=Hg,fill=Sex))+ylim(0,1)+xlim(10,20)+theme_minimal()+
 Dispersion<-ggplot(Y,aes(x=BMI,y=Hg,color=Sex))+geom_point()
 model<- lm(Hg~BMI+Sex,data=Y)
 summary(model)
+#Variables Clasificadoras
+data(ais)
+par(mfrow=c(1,2))
+boxplot(ais$Hg~ais$Sex,pch=19,col=c(3,2))
+plot(density(ais$Hg))
+plot(density(ais$Hg[ais$Sex==0]),xlim=c(11,20),lwd=2,main = '',ylab='Densidad',xlab='Hg (g/dl)')
+lines(density(ais$Hg[ais$Sex==1]),col=2,lwd=2)
+plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19)
+#
+ais$Sex<- factor(ais$Sex)
+ais$Sex<- relevel(ais$Sex,"1")
+mod.ais = lm(Hg~Sex*BMI, data=ais)
+summary(mod.ais)
+# Gráfico
+#Pendientes que intersecan
+plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19,xlim=c(-20,50),ylim=c(0,30))
+abline(a=mod.ais$coefficients[1],b=mod.ais$coefficients[3],lwd=2)
+abline(a=mod.ais$coefficients[1]+mod.ais$coefficients[2],b=mod.ais$coefficients[3]+mod.ais$coefficients[4],col=2,lwd=2)
+abline(v=0,h=0,lty=2,lwd=2)
+
+grid()
+legend(x = "bottomright",legend=c("Hombres","Mujeres"),
+       col=c('black',2),pt.cex=1,pch=15,title='Género',
+       box.lwd=1,text.font =20,cex=0.8)
+##
+mod.ais.red = lm(Hg~BMI, data=ais)
+summary(mod.ais.red)
+anova(mod.ais.red,mod.ais)
+##
+mod.ais.lp = lm(Hg~Sex+BMI, data=ais)
+summary(mod.ais.lp)
+###
+data("ais")
+plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19,xlim=c(-10,40),ylim=c(-10,30))
+abline(a=mod.ais$coefficients[1],b=mod.ais$coefficients[3],lwd=2)
+abline(a=mod.ais$coefficients[1]+mod.ais$coefficients[2],b=mod.ais$coefficients[3]+mod.ais$coefficients[4],col=2,lwd=2)
+abline(a=mod.ais.lp$coefficients[1],b=mod.ais.lp$coefficients[3],lwd=2,lty=2)
+abline(a=mod.ais.lp$coefficients[1]+mod.ais.lp$coefficients[2],b=mod.ais.lp$coefficients[3],col=2,lwd=2,lty=2)
+abline(h=0,v=0,lty=2,lwd=2)
+grid()
+legend(x = "bottomright",legend=c("Hombres1","Mujeres1","Hombres2","Mujeres2"),
+       col=c('black',2),pt.cex=1,title='Género',lty=c(1,1,2,2),
+       box.lwd=1,text.font =20,cex=0.8)
+#Hipotésis
+anova(mod.ais,mod.ais.lp)
+#Nos quedamos con 
+plot(Hg~BMI,data=ais,col=ais$Sex+1,ylab='Hg (g/dl)',xlab='BMI',pch=19,xlim=c(-100,100),ylim=c(0,20))
+abline(h=0,v=0,lty=2,lwd=2)
+abline(a=mod.ais.lp$coefficients[1],b=mod.ais.lp$coefficients[3],lwd=2,lty=2,col=2)
+abline(a=mod.ais.lp$coefficients[1]+mod.ais.lp$coefficients[2],b=mod.ais.lp$coefficients[3],col=1,lwd=2,lty=2)
+#
+influencePlot(mod.ais.lp)
+################################################
+par(mfrow=c(1,1))
+p<- length(coefficients(mod.ais.lp))
+n<- nrow(X)
+hii.c<- 2*p/n
+influencePlot(mod.ais.lp,panel.first=grid())
+hii<- hatvalues(mod.ais.lp)
+hii.ind<- hii[hii>hii.c]
+plot(hii,ylab="Valores diagonal de la matriz Hat",pch=19,xlab="Indíces",ylim=c(0,0.3),panel.first=grid())
+points((1:nrow(ais))[hii>hii.c],hii.ind,col="red",pch=19)
+text((1:nrow(ais))[hii>hii.c],hii.ind,labels=rownames(ais)[(1:nrow(ais))[hii>hii.c]],pos=c(1,2,3,3,3,1,3,3,1),cex=0.8)
+abline(h=2*p/n,lty=2)
+n<- length(residuals(mod.ais.lp))
+p<- length(coefficients(mod.ais.lp))
+res.ponderados<-studres(mod.ais.lp)
+hii.c<-2*(p/n)
+abline(h=hii.c,lty=2,lwd=2)
+indices.1<-(1:nrow(ais))[hii<hii.c & abs(res.ponderados)>2]
+indices.2<-(1:nrow(ais))[hii>hii.c & abs(res.ponderados)> qt(0.95,n-p-1)]
+indices.3<- (1:nrow(ais))[hii>hii.c & abs(res.ponderados)< 2]
+plot(hii,res.ponderados,pch=19,xlab="Valores de la diagonal de la matriz hat", ylab=" Residuos estudentizados",ylim=c(-3,3),xlim=c(0,0.1),panel.first=grid())
+abline(h=c(1,0,-1)*2,lty=2,v=hii.c)
+points(hii[indices.3],res.ponderados[indices.3],col="yellow",pch=19)
+text(hii[indices.3],res.ponderados[indices.3],labels=rownames(ais)[indices.3],pos=3)
+points(hii[indices.2],res.ponderados[indices.2],col="red",pch=19)
+text(hii[indices.2],res.ponderados[indices.2],labels=rownames(ais)[indices.2],pos=4)
+points(hii[indices.1],res.ponderados[indices.1],col="aquamarine",pch=19)
+text(hii[indices.1],res.ponderados[indices.1],labels=rownames(ais)[indices.1],pos=c(1,3,4))
+legend(x = "topright",legend=c("Influyente","Balanceo","Atípico"),
+       col = c("red","yellow","aquamarine"),pch=c(19,19,19),pt.cex=2,
+       box.lwd=0.6,title="Identificación de puntos",text.font =15,cex=0.6)
+#####
+View(ais[(1:nrow(ais))[hii>hii.c],])
+############## Distancia de Cook
+ck<- cooks.distance(mod.ais.lp)
+plot(ck,ylab="Distancia de Coock",pch=19,ylim=c(min(ck),max(ck)+0.1),panel.first=grid())
+ck.c<- 4/n
+abline(h=ck.c,lty=2)
+indices<- (1:nrow(ais))[ck>ck.c]
+ck<- ck[ck>ck.c]
+points(indices,ck,col="red",pch=19)
+text(indices,ck,labels=rownames(ais)[indices],pos=3,cex=0.6)
+########### DfBetas
+#Beta 1
+par(mfrow=c(1,1))
+DFBETAS = dfbetas(mod.ais.lp)
+head(DFBETAS)
+plot(DFBETAS[,2],ylab=quote('DFBETA'~(beta[1])),xlab="Indíce",pch=19,ylim=c(-0.4,0.5),xlim=c(0,150),panel.first=grid())
+ind = (1:nrow(ais))[abs(DFBETAS[,2]) > 2/sqrt(nrow(ais))]
+dfb = DFBETAS[abs(DFBETAS[,2]) > 2/sqrt(nrow(X)) ,2]
+abline(h=c(1,-1)*2/sqrt(nrow(ais)))
+text(ind,dfb,rownames(ais)[abs(DFBETAS[,2]) > 2/sqrt(nrow(ais))],pos=c(1,4,3,4),
+     cex=0.8)
+points(ind,dfb,col="red",pch=19)
+################ Dffits
+par(mfrow=c(1,1))
+DFFITS = dffits(mod.ais.lp)
+plot(DFFITS,xlab="Indíces",pch=19,xlim=c(-30,250),ylim=c(-1,1),panel.first=grid())
+abline(h=c(-1,1)*2*sqrt(p/n))
+ind = (1:nrow(ais))[abs(DFFITS) > 2*sqrt(p/n)]
+dfb = DFFITS[abs(DFFITS) > 2*sqrt(p/n)]
+text(ind,dfb,rownames(ais)[abs(DFFITS) > 2*sqrt(p/n)],pos=2)
+points(ind,dfb,col="purple4",pch=19)
+################ CovRatio
+COVR = covratio(mod.ais.lp)
+plot(COVR,pch=19,ylab="Covratio",xlab="Indíce",panel.first=grid())
+abline(h=1+c(-1,1)*3*(p/n))
+covr = COVR[COVR > 1 +3*(p/n) | COVR < 1 -3*(p/n) ]
+ind = (1:nrow(ais))[COVR > 1 +3*(p/n) | COVR < 1 -3*(p/n) ]
+text(ind,covr,rownames(ais)[COVR > 1 +3*(p/n) | COVR < 1 -3*(p/n)],pos=4)
+points(ind,covr,col="purple4",pch=19)
+#
+influenceIndexPlot(mod.ais.lp)
+influence.measures(mod.ais.lp)
