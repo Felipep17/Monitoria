@@ -213,3 +213,4 @@ legend(x = "bottomright",legend=c("Modelo","Intervalo de confianza 95%","Interva
        box.lwd=0.6,text.font =15,cex=0.5)
 confint(model)
 summary(X)
+#s
